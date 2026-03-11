@@ -1,7 +1,6 @@
 import axios from 'axios';
 
-// 🔥 Only base domain here (NO /predict)
-const API_BASE_URL = 'https://cardiovascular-disease-ml-app-3.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -14,14 +13,9 @@ apiClient.interceptors.response.use(
   (error) => {
     const message =
       error.response?.data?.error ||
-      (error.code === 'ECONNABORTED'
-        ? 'Request timed out.'
-        : null) ||
-      (error.code === 'ERR_NETWORK'
-        ? 'Cannot connect to backend server.'
-        : null) ||
+      (error.code === 'ECONNABORTED' ? 'Request timed out.' : null) ||
+      (error.code === 'ERR_NETWORK' ? 'Cannot connect to server. Make sure Flask is running on port 5000.' : null) ||
       'An unexpected error occurred.';
-
     return Promise.reject({ ...error, userMessage: message });
   }
 );
@@ -37,7 +31,6 @@ export const predictRisk = async (formData) => {
     smoke: Number(formData.smoke),
     alco: Number(formData.alco),
   };
-
   const response = await apiClient.post('/predict', payload);
   return response.data;
 };

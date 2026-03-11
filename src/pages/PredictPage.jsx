@@ -30,7 +30,6 @@ const fieldGroups = [
       { name: 'ap_lo', label: 'Diastolic BP', placeholder: 'e.g. 80', icon: Activity, unit: 'mmHg', min: 40, max: 200 },
     ],
   },
-  // ADD THIS NEW GROUP:
   {
     title: 'Lifestyle Factors', icon: Activity,
     fields: [
@@ -75,8 +74,9 @@ export default function PredictPage() {
           prediction: data.prediction, 
           confidence: data.confidence 
         });
+      } else {
+        setApiError('Unexpected response from server.');
       }
-      else setApiError('Unexpected response from server.');
     } catch (err) {
       setApiError(err.userMessage || 'Failed to connect. Make sure Flask API is running on port 5000.');
     } finally {
@@ -88,14 +88,14 @@ export default function PredictPage() {
   const handleKeyDown = useCallback((e) => { if (e.key === 'Enter') handleSubmit(); }, [handleSubmit]);
 
   const filledCount = Object.values(values).filter(v => v !== '').length;
-const progress = (filledCount / 8) * 100;
+  const progress = (filledCount / 8) * 100;
 
   return (
     <motion.div className="relative z-10 w-full max-w-lg mx-auto px-4 pb-16"
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
 
       <AnimatePresence mode="wait">
-       {result ? (
+        {result ? (
           <ResultCard 
             key="result" 
             result={result?.prediction || result} 
